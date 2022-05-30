@@ -1,0 +1,16 @@
+#pragma once
+#include "Martien.h" 
+<<<<<<< HEAD
+class UniversalBeings : public Martien {
+public:
+	UniversalBeings(Coord coord, char apparence, unsigned short valeurPoints);
+=======
+#include "Enhancedlaser.h"
+#include <string>
+class UniversalBeings : public Martien {
+	std::string trueApparence;
+public:
+	UniversalBeings(Coord coord, char apparence, unsigned short valeurPoints, std::string trueApparence);
+>>>>>>> 368afa859064a2b2b9d05c92fa14885330481f52
+	void deplacer() override;
+};

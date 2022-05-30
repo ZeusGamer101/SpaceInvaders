@@ -1,0 +1,253 @@
+#include "Partie.h"
+#include "Vaisseau.h"
+#include "UIKit.h"
+#include <iostream>
+#include <conio.h>
+#include "Enhancedlaser.h"
+#include "TypeLaser.h"
+#include "Martien.h"
+#include "SuperMartien.h"
+#include<time.h>
+#include "GameOver.h"
+void Partie::debuter()
+{
+	bool play = true;
+	PlaySound(TEXT("easymodebattle"), NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+	UIKit::curseurVisible(false);
+	UIKit::cadre(1, 1, 70, 30, 12);
+	bool partieTermine = false;
+	//Faire apparaitre le vaisseau
+	const unsigned short MINLEFT = 11;
+	const unsigned short MAXRIGHT = 59;
+	const unsigned short MAXBELOW = 28;
+	const unsigned short MINENEMYUP = 5;
+	const unsigned short MAXENEMYDOWN = 20;
+	Coord coordonneesDepartVaisseau(30, MAXBELOW);
+	Coord limiteMouvementGauche(MINLEFT, MAXBELOW);
+	Coord limiteMouvementDroite(MAXRIGHT, MAXBELOW);
+	UIKit::color(13);
+	char apparenceDuVaisseau = 'A';
+	Vaisseau vaisseau(apparenceDuVaisseau, coordonneesDepartVaisseau, limiteMouvementGauche, limiteMouvementDroite);
+	UIKit::color(10);
+	int nbMartien = 3;
+	int nbSuper = 1;
+	const unsigned short MAX_MARTIEN = 15;
+	Martien** enemy;
+	SuperMartien** alien;
+	srand(time(0));
+	enemy = new Martien * [MAX_MARTIEN];
+	alien = new SuperMartien * [MAX_MARTIEN];
+	unsigned short controlSuperAlien = 35;
+	unsigned short controlAlien = 15;
+	unsigned short controlLaser = 45;
+	unsigned short controlMovement = 10;
+	short nbrVie = 3;
+	int score = 0;
+	bool win;
+	for (int i = 0; i < nbMartien; i++) {
+<<<<<<< HEAD
+		Coord spawnEnemyInit(rand() % (MAXRIGHT - MINLEFT + 1) + MINLEFT, rand() % (MAXENEMYDOWN - MINENEMYUP + 1) + MINENEMYUP);
+		enemy[i] = new  Martien(spawnEnemyInit, 'M', 100);
+=======
+		Coord spawnEnemyInit(rand() % (MAXRIGHT - MINLEFT + 1) + MINLEFT, rand() % (MINENEMYDOWN - MINENEMYUP + 1) + MINENEMYUP);
+		enemy[i] = new  Martien(spawnEnemyInit, 'S', 100);
+>>>>>>> 592b44d37a30abe89d318524c04b80dc22d89a49
+	}
+	for (int i = 0; i < nbSuper; i++) {
+		Coord spawnEnemy(rand() % (MAXRIGHT - MINLEFT + 1) + MINLEFT, rand() % (MAXENEMYDOWN - MINENEMYUP + 1) + MINENEMYUP);
+		alien[i] = new SuperMartien(spawnEnemy, 'S', 150);
+	}
+	int nbLaser = 0;
+	Enhancedlaser* lasers[500];
+	do {
+		//Récupérer la touche appuyée par l'utilisateur
+		//Effectuer action en fonction de la touche appuyé par l'utilisateur
+		//Ici on peut soit déplacer le vaiseau à gauche ou à droite, soit tirer un laser
+		if (GetAsyncKeyState(VK_LEFT)) {
+			UIKit::color(13);
+			vaisseau.deplacer(Direction::GAUCHE);
+			UIKit::color(10);
+		}
+		else if (GetAsyncKeyState(VK_RIGHT)) {
+			UIKit::color(13);
+			vaisseau.deplacer(Direction::DROITE);
+			UIKit::color(10);
+		}
+		if (GetAsyncKeyState(VK_SPACE)) {
+			lasers[nbLaser] = new Enhancedlaser(vaisseau.getCoord(), TypeLaser::JOUEUR);
+			nbLaser++;
+		}
+		if (GetAsyncKeyState(VK_ESCAPE)) {
+			UIKit::gotoXY(15, 15);
+			system("pause");
+		}
+		//controller la music
+		if (GetAsyncKeyState(0x4D)) {
+			if (play == true) {
+				play = false;
+				PlaySound(NULL, NULL, SND_SYNC);
+			}
+			else {
+				play = true;
+				PlaySound(TEXT("easymodebattle"), NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+			}
+		}
+		if (GetAsyncKeyState(0x42)) {
+
+		}
+		//Déplacer les lasers du vaisseau et des extraterrestres
+		for (int i = 0; i < nbLaser; i++) {
+			lasers[i]->deplacer();
+		}
+		//Déplacer les extraterrestres
+		for (int i = 0; i < nbMartien; i++) {
+			int moverate = rand() % controlMovement;
+			if (moverate == 1) {
+				enemy[i]->deplacer();
+			}
+		}
+		for (int i = 0; i < nbSuper; i++) {
+			int moveSuperRate = rand() % controlMovement;
+			if (moveSuperRate == 1) {
+				alien[i]->deplacer();
+			}
+		}
+		//Faire tirer les extraterrestres
+		for (int j = 0; j < nbMartien; j++) {
+			int shootRate = rand() % controlLaser;
+			if (shootRate == 1) {
+				lasers[nbLaser] = new Enhancedlaser(enemy[j]->getCoord(), TypeLaser::EXTRATERRESTRE);
+				nbLaser++;
+			}
+		}
+		for (int j = 0; j < nbSuper; j++) {
+			int shootRate = rand() % controlLaser;
+			if (shootRate == 1) {
+				lasers[nbLaser] = new Enhancedlaser(alien[j]->getCoord(), TypeLaser::EXTRATERRESTRE);
+				nbLaser++;
+			}
+		}
+		for (int i = 0; i < nbLaser; i++) {
+			if (lasers[i]->isActif() == false) {
+				delete lasers[i];
+				lasers[i] = lasers[nbLaser - 1];
+				nbLaser--;
+				i--;
+			}
+		}
+		//Vérifier collision entre laser et joueur ou ennemis
+		for (int j = 0; j < nbSuper; j++) {
+			for (int i = 0; i < nbLaser; i++) {
+				bool collision = lasers[i]->detecterCollision(*alien[j]);
+				TypeLaser type = lasers[i]->getTypeLaser();
+				if (collision == true && type == TypeLaser::JOUEUR) {
+					alien[j]->detruire();
+					lasers[i]->detruire();
+					score += alien[j]->getValeurPoints();
+				}
+			}
+		}
+		for (int j = 0; j < nbMartien; j++) {
+			for (int i = 0; i < nbLaser; i++) {
+				bool collision = lasers[i]->detecterCollision(*enemy[j]);
+				TypeLaser type = lasers[i]->getTypeLaser();
+				if (collision == true && type == TypeLaser::JOUEUR) {
+					enemy[j]->detruire();
+					lasers[i]->detruire();
+					score += enemy[j]->getValeurPoints();
+				}
+			}
+		}
+		for (int i = 0; i < nbLaser; i++) {
+			bool collision = lasers[i]->detecterCollision(vaisseau);
+			if (collision == true) {
+				if (collision == true) {
+					vaisseau.detruire();
+					lasers[i]->detruire();
+					score = score / 2;
+					nbrVie--;
+				}
+			}
+		}
+		if (vaisseau.isActif() == false) {
+
+		}
+		//Faire apparaitre nouveau extraterrestre
+		//1/24 de faire spawn un alien
+		int spawnrateSuper = rand() % controlSuperAlien;
+		if (spawnrateSuper == 1) {
+			//coord random que les aliens spawn
+			Coord coord(rand() % (MAXRIGHT - MINLEFT + 1) + MINLEFT, rand() % (MAXENEMYDOWN - MINENEMYUP + 1) + MINENEMYUP);
+			nbSuper++;
+			alien[nbSuper - 1] = new SuperMartien(coord, 'S', 150);
+		}
+		int spawnrate = rand() % controlAlien;
+		if (spawnrate == 1) {
+			//coord random que les aliens spawn
+			Coord coord(rand() % (MAXRIGHT - MINLEFT + 1) + MINLEFT, rand() % (MAXENEMYDOWN - MINENEMYUP + 1) + MINENEMYUP);
+			nbMartien++;
+			enemy[nbMartien - 1] = new Martien(coord, 'M', 100);
+		}
+		//detruire un alien
+		for (int i = 0; i < nbMartien; i++) {
+			if (enemy[i]->isActif() == false) {
+				delete enemy[i];
+				enemy[i] = enemy[nbMartien - 1];
+				nbMartien--;
+				i--;
+			}
+		}
+		for (int i = 0; i < nbSuper; i++) {
+			if (alien[i]->isActif() == false) {
+				delete alien[i];
+				alien[i] = alien[nbSuper - 1];
+				nbSuper--;
+				i--;
+			}
+		}
+		int nbEnemy = nbSuper + nbMartien;
+		//Mettre à jour le score affiché
+		UIKit::color(11);
+		UIKit::gotoXY(4, 30);
+		std::cout << "            ";
+		UIKit::gotoXY(4, 30);
+		std::cout << " Score: " << score;
+		UIKit::gotoXY(4, 1);
+		std::cout << "             ";
+		UIKit::gotoXY(4, 1);
+		std::cout << " NbLaser: " << nbLaser;
+		UIKit::gotoXY(50, 1);
+		std::cout << "              ";
+		UIKit::gotoXY(50, 1);
+		std::cout << " NbEnemy: " << nbEnemy;
+		UIKit::gotoXY(54, 30);
+		std::cout << "         ";
+		UIKit::gotoXY(54, 30);
+		std::cout << " Life: " << nbrVie;
+		UIKit::curseurVisible(false);
+		UIKit::color(10);
+		//Vérifier si on gagne (si le nombre d'extraterrestre est rendu à 0)		
+		if (nbEnemy == 0) {
+			partieTermine = true;
+			win = true;
+		}
+		//Vérifier si on perd si le nombre d'extra terrestre est à 15+ ou 
+		if (nbEnemy >= MAX_MARTIEN) {
+			partieTermine = true;
+			win = false;
+		}
+		//qu'un laser extraterrestre nous a atteint
+		else if (nbrVie == 0) {
+			partieTermine = true;
+			win = false;
+		}
+		Sleep(35);
+	} while (partieTermine == false);
+	if (win == false) {
+		GameOver::afficher();
+	}
+	if (partieTermine == true) {
+		PlaySound(TEXT("BleachHeatSoul7Menu"), NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+	}
+	system("cls");
+}

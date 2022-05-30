@@ -1,0 +1,31 @@
+#include "Menu.h"
+#include <iostream>
+#include "Partie.h"
+#include "UIKit.h"
+#include <windows.h>
+void Menu::afficher()
+{
+<<<<<<< HEAD
+	//PlaySound(TEXT("BleachHeatSoul7Menu"), NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+=======
+>>>>>>> b6c2d57d8ed7b27a02794cae3d53b741409dc8b4
+	UIKit::color(10);
+	UIKit::curseurVisible(false);
+	UIKit::gotoXY(25, 8);
+	std::cout << "SPACE INVADERS" << std::endl;
+	UIKit::gotoXY(19, 12);
+	UIKit::color(12);
+	std::cout << "Appuyer sur ENTER pour START" << std::endl;
+	UIKit::gotoXY(22, 13);
+	std::cout << "INSTRUCTION (Spacebar)" << std::endl;
+	UIKit::gotoXY(26, 14);
+	std::cout << "README (ctrl)" << std::endl;
+	UIKit::gotoXY(26, 15);
+	std::cout << "QUITTER (Esc)" << std::endl;
+	UIKit::color(8);
+}
+
+unsigned short Menu::getChoix() const
+{
+	return this->choix;
+}
