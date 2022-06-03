@@ -21,3 +21,5 @@
         Press A for bomb : bomb will clear all lasers on screen
         Press M to mute/unmute BGM
         Press ESC to pause the game
+        
+        Install visual studio code 2019
