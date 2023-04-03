@@ -22,4 +22,4 @@
         Press M to mute/unmute BGM
         Press ESC to pause the game
         
-        Install visual studio code 2019
+        Update visual studio so that the project can work correctly.
